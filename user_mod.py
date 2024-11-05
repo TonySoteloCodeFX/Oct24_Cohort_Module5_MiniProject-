@@ -1,5 +1,9 @@
 from helpers import clr, hr
 from art import main_user_menu
+from sql_connection import connection_to_db
+
+connection = connection_to_db()
+cursor = connection.cursor()
 
 class User:
     users = []
@@ -29,6 +33,9 @@ class User:
             print(f"User Name: {user.get_user_name()}")
 
 # ==================== ***** Functions ***** ====================
+# def sql_add_user():
+#     try:
+#         full_name = input("Enter Full Name: ")
 
 def add_user():
     clr()
@@ -36,12 +43,24 @@ def add_user():
     try:
         name = input("Enter Name: ")
         new_user = User(name)
+        query = '''
+                INSERT INTO users (name)
+                VALUES (%s);
+                '''
+        cursor.execute(query, (name,))
+        connection.commit()
+        new_user_id = cursor.lastrowid
         clr()
         hr(50)
         print("The following user has been created.\n")
         print(f"Library ID: {new_user.user_id}\nUser: {new_user.name}")
+
     except ValueError:
         print("Invalid Input. Try again.")
+
+    finally:
+        cursor.close()
+        connection.close()
 
 def display_users():
     User.display_all_users()

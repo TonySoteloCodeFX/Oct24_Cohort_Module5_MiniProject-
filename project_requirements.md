@@ -5,11 +5,11 @@
 
 In this project, you will integrate a MySQL database with Python to develop an advanced Library Management System. This command-line-based application is designed to streamline the management of books and resources within a library. Your mission is to create a robust system that allows users to browse, borrow, return, and explore a collection of books while demonstrating your proficiency in database integration, SQL, and Python.
 
-<h5>Integration with the "Library Management System" Project from Module 4 (OOP):</h5>
+<h4>Integration with the "Library Management System" Project from Module 4 (OOP):</h4>
 
 For this project, you will build upon the foundation laid in "Module 4: Python Object-Oriented Programming (OOP)." The object-oriented structure and classes you developed in that module will serve as the core framework for the Library Management System. You will leverage the classes such as <b>Book, User, Author, and Genre</b> that you previously designed, extending their capabilities to integrate seamlessly with the MySQL database.
 
-<h5>Enhanced User Interface (UI) and Menu:</h5>
+<h4>Enhanced User Interface (UI) and Menu:</h4>
 
 1. Create an improved, user-friendly command-line interface (CLI) for the Library Management System with separate menus for each class of the system.
 
@@ -23,7 +23,7 @@ Main Menu:
 4. Quit
 ```
 
-<h5>Book Operations:</h5>
+<h4>Book Operations:</h4>
 
 ```
 Book Operations:
@@ -34,7 +34,7 @@ Book Operations:
 5. Display all books
 ```
 
-<h5>User Operations:</h5>
+<h4>User Operations:</h4>
 
 ```
 User Operations:
@@ -43,7 +43,7 @@ User Operations:
 3. Display all users
 ```
 
-<h5>Author Operations:</h5>
+<h4>Author Operations:</h4>
 
 ```
 Author Operations:
@@ -52,7 +52,7 @@ Author Operations:
 3. Display all authors
 ```
 
-<h5>Database Integration with MySQL:</h5>
+<h4>Database Integration with MySQL:</h4>
 
 1. Integrate a MySQL database into the Library Management System to store and retrieve data related to books, users, authors, and genres.
 <br>
@@ -62,7 +62,7 @@ Author Operations:
 
 3. Establish connections between Python and the MySQL database for data manipulation, enhancing the persistence and scalability of your Library Management System.
 
-<h5>Data Definition Language Scripts:</h5>
+<h4>Data Definition Language Scripts:</h4>
 
 1. Create the necessary database tables for the Library Management System. For instance:
 <br>
@@ -117,11 +117,11 @@ CREATE TABLE borrowed_books (
 
 💡 **Note:** You can reuse the clean code and functions developed in the "Module 4: Python Object-Oriented Programming (OOP)" project to maintain consistency and reduce redundancy. Emphasize the importance of code reusability and modular design to make it easier to integrate the database functionality into their existing project.
 
-<h5>Submission</h5>
+<h4>Submission</h4>
 
 <li>Upon completing the project, submit your code, including all source code files, and the README.md file in your GitHub repository to your instructor or designated platform.</li>
 
-<h5>Project Tips</h5>
+<h4>Project Tips</h4>
 
 1. <b>Reuse Your OOP Project:</b> Take advantage of the object-oriented structure and classes you developed in "Module 4: Python Object-Oriented Programming (OOP)." This will save you time and effort by providing a solid foundation for integrating the database functionality.
 
