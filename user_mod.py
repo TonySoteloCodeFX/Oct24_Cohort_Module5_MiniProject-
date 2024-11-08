@@ -63,7 +63,6 @@ def add_user():
         cursor.close()
         connection.close()
 
-
 def display_all_users():
     clr()
     hr(50)
@@ -87,9 +86,6 @@ def display_all_users():
     finally:
         cursor.close()
         connection.close()
-
-
-
 
 def user_menu():
     clr()

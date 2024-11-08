@@ -1,32 +1,57 @@
 from helpers import clr, hr
 from art import main_author_menu
+from sql_connection import connection_to_db
 
 class Author:
-    authors = []
 
     def __init__(self, name, biography):
         self.name = name
         self.biography = biography
-        Author.authors.append(self)
 
-    def get_author_name(self):
-        return self.name
+    def fetch_author_by_name(self):
+        self.connection = connection_to_db()
 
-    def get_biography(self):
-        return self.biography
+        if self.connection is None:
+            print("Failed to connect to database.")
+            return
+        
+        self.cursor = self.connection.cursor()
+        try:
+            self.name = input("Enter Author Name: ")
+            self.query = '''
+                            SELECT * From authors
+                            WHERE name = %s
+                            '''
+            self.cursor.execute(self.query, (self.name,))
+            for row in self.cursor.fetchall():
+                print(row)
+        finally:
+            self.cursor.close()
+            self.connection.close()
 
-    @classmethod
-    def display_all_authors(cls):
-        clr()
-        hr(50)
-        print("All Authors")
-        for author in cls.authors:
-            hr(50)
-            print(f"Name: {author.get_author_name()}")
-            print(f"Biography: {author.get_biography()}")
+    def fetch_biography(self):
+        self.connection = connection_to_db()
+
+        if self.connection is None:
+            print("Failed to connect to database.")
+            return
+        
+        self.cursor = self.connection.cursor()
+        try:
+            self.name = input("Enter Author Name: ")
+            self.query = '''
+                            SELECT biography FROM authors
+                            WHERE name = %s
+                            '''
+            self.cursor.execute(self.query, (self.name,))
+            for row in self.cursor.fetchall():
+                print(row)
+        finally:
+            self.cursor.close()
+            self.connection.close()
 
 # ==================== ***** Functions ***** ====================
-
+# From here down needs fixing 
 def add_author():
     clr()
     hr(50)
@@ -81,11 +106,11 @@ def author_menu():
             author_operation = int(input("Enter Number: "))
 
             if author_operation == 1:
-                add_author()
+                pass
             elif author_operation == 2:
-                view_author_details()
+                pass
             elif author_operation == 3:
-                display_authors()
+                pass
             elif author_operation == 4:
                 clr()
                 hr(50)
