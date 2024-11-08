@@ -74,15 +74,14 @@ def display_all_users():
         cursor.execute(query)
         columns = cursor.column_names
 
-        hr(50)
         print(f"All Users:\n")
 
         for row in cursor.fetchall():
+            hr(50)
             row_data = dict(zip(columns, row))
 
             for column, value in row_data.items():
                 print(f"{column}: {value}")
-            hr(50)
     finally:
         cursor.close()
         connection.close()

@@ -51,23 +51,63 @@ class Author:
             self.connection.close()
 
 # ==================== ***** Functions ***** ====================
-# From here down needs fixing 
+
 def add_author():
     clr()
     hr(50)
     try:
+        connection = connection_to_db()
+        cursor = connection.cursor()
+
         name = input("Enter Author's Name: ")
         biography = input("Enter Biography: ")
-        new_author = Author(name, biography)
+
+        query = '''
+                    INSERT INTO authors (
+                    name, 
+                    biography)
+                    Values (%s, %s);
+                    '''
+        cursor.execute(query, (name, biography))
+        connection.commit()
+        new_author_id = cursor.lastrowid
+
         clr()
         hr(50)
-        print("The following author has been added.\n")
-        print(f"Name: {new_author.name}\nBiography: {new_author.biography}")
+        print("The following author has been added:\n")
+        print(f"Author ID: {new_author_id}\nName: {name}")
+
     except ValueError:
+        clr()
+        hr(50)
         print("Invalid Input. Try again.")
 
+    finally:
+        cursor.close()
+        connection.close()
+# From here down needs fixing 
 def display_authors():
-    Author.display_all_authors()
+    clr()
+    hr(50)
+    try:
+        connection = connection_to_db()
+        cursor = connection.cursor()
+
+        query = '''SELECT * FROM authors'''
+        cursor.execute(query)
+        columns = cursor.column_names
+
+        print("All Authors:\n")
+
+        for row in cursor.fetchall():
+            hr(50)
+            row_data = dict(zip(columns, row))
+            print(f"ID: {row_data['id']}\nName: {row_data['name']}\nBio: {row_data['biography']}")
+        hr(50)
+        
+    finally:
+        cursor.close()
+        connection.close()
 
 def view_author_details():
     clr()
@@ -106,11 +146,11 @@ def author_menu():
             author_operation = int(input("Enter Number: "))
 
             if author_operation == 1:
-                pass
+                add_author()
             elif author_operation == 2:
                 pass
             elif author_operation == 3:
-                pass
+                display_authors()
             elif author_operation == 4:
                 clr()
                 hr(50)
