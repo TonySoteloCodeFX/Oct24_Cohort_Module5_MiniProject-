@@ -2,47 +2,46 @@ from helpers import clr, hr
 from art import main_user_menu
 from sql_connection import connection_to_db
 
-connection = connection_to_db()
-cursor = connection.cursor()
-
 class User:
-    users = []
-    user_id = 0
 
     def __init__(self, name):
         self.name = name
         self.book_list = []
-        User.user_id += 1
-        self.user_id = User.user_id
-        User.users.append(self)
 
-    def get_user_name(self):
-        return self.name
-    
-    def get_user_id(self):
-        return self.user_id
+    def fetch_user_by_name(self):
+        self.connection = connection_to_db()
 
-    @classmethod
-    def display_all_users(cls):
-        clr()
-        hr(50)
-        print("All Users")
-        for user in cls.users:
-            hr(50)
-            print(f"Library ID: {user.get_user_id()}")
-            print(f"User Name: {user.get_user_name()}")
+        if self.connection is None:
+            print("Failed to connect to database.")
+            return
+        
+        self.cursor = self.connection.cursor()
+        try:
+            self.name = input("Enter User Name: ")
+            self.query = '''
+                            SELECT * FROM users 
+                            WHERE name = %s
+                            '''
+            
+            self.cursor.execute(self.query, (self.name,))
+            for row in self.cursor.fetchall():
+                print(row)
+        finally:
+            self.cursor.close()
+            self.connection.close()
+            
 
 # ==================== ***** Functions ***** ====================
-# def sql_add_user():
-#     try:
-#         full_name = input("Enter Full Name: ")
 
 def add_user():
+    '''Creates a new user in user table and assigns an ID'''
     clr()
     hr(50)
     try:
+        connection = connection_to_db()
+        cursor = connection.cursor()
+
         name = input("Enter Name: ")
-        new_user = User(name)
         query = '''
                 INSERT INTO users (name)
                 VALUES (%s);
@@ -53,43 +52,44 @@ def add_user():
         clr()
         hr(50)
         print("The following user has been created.\n")
-        print(f"Library ID: {new_user.user_id}\nUser: {new_user.name}")
+        print(f"Library ID: {new_user_id}\nUser: {name}")
 
     except ValueError:
+        clr()
+        hr(50)
         print("Invalid Input. Try again.")
 
     finally:
         cursor.close()
         connection.close()
 
-def display_users():
-    User.display_all_users()
 
-def view_details():
+def display_all_users():
     clr()
     hr(50)
-    view_user = input("Enter Name: ")
+    try:
+        connection = connection_to_db()
+        cursor = connection.cursor()
 
-    user_to_view = None
-    for user in User.users:
-        if user.get_user_name() == view_user:
-            user_to_view = user
-            break
-    if user_to_view:
-        clr()
+        query = '''SELECT * FROM users'''
+        cursor.execute(query)
+        columns = cursor.column_names
+
         hr(50)
-        print(f"User ID: {user_to_view.get_user_id()}")
-        print(f"User Name: {user_to_view.get_user_name()}")
-        hr(50)
-        if user_to_view.book_list:
-            print("Books Borrowed: ")
-            for book in user_to_view.book_list:
-                print(f"Title: {book.get_title()}\n")
-        else:
-            print("No books borrowed.")
-        hr(50)
-    else:
-        print(f"User: {view_user} not found.")
+        print(f"All Users:\n")
+
+        for row in cursor.fetchall():
+            row_data = dict(zip(columns, row))
+
+            for column, value in row_data.items():
+                print(f"{column}: {value}")
+            hr(50)
+    finally:
+        cursor.close()
+        connection.close()
+
+
+
 
 def user_menu():
     clr()
@@ -110,9 +110,9 @@ def user_menu():
             if user_operation == 1:
                 add_user()
             elif user_operation == 2:
-                view_details()
+                pass
             elif user_operation == 3:
-                display_users()
+                display_all_users()
             elif user_operation == 4:
                 clr()
                 hr(50)

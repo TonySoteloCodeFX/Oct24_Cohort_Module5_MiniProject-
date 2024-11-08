@@ -27,3 +27,4 @@ def connection_to_db():
         # handle any connection errors 
         print(f"Error: {e}")
         return None
+        
