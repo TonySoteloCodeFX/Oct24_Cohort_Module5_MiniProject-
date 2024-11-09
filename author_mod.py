@@ -1,5 +1,5 @@
 from helpers import clr, hr
-from art import main_author_menu
+from art import main_author_menu, congrats
 from sql_connection import connection_to_db
 
 class Author:
@@ -59,23 +59,40 @@ def add_author():
         connection = connection_to_db()
         cursor = connection.cursor()
 
-        name = input("Enter Author's Name: ")
+        authors_name = input("Enter Author's Name: ")
         biography = input("Enter Biography: ")
 
-        query = '''
+        title = input("Enter Book Title: ")
+        genre = input("Enter Book Genre: ")
+        publication_date = input("Enter Publication Date: ")
+
+        query1 = '''
                     INSERT INTO authors (
                     name, 
                     biography)
                     Values (%s, %s);
                     '''
-        cursor.execute(query, (name, biography))
+        cursor.execute(query1, (authors_name, biography))
         connection.commit()
         new_author_id = cursor.lastrowid
 
+        query2 = '''
+                INSERT INTO books (
+                title,
+                genre,
+                publication_date,
+                author_id)
+                VALUES (%s, %s, %s, %s);
+                '''
+        cursor.execute(query2, (title, genre, publication_date, new_author_id))
+        connection.commit()
+        
         clr()
         hr(50)
+        print(congrats)
         print("The following author has been added:\n")
-        print(f"Author ID: {new_author_id}\nName: {name}")
+        print(f"Author ID: {new_author_id}\nName: {authors_name}")
+        hr(50)
 
     except ValueError:
         clr()

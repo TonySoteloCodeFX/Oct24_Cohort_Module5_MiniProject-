@@ -1,5 +1,5 @@
 from helpers import clr, hr
-from art import main_book_menu
+from art import main_book_menu, congrats
 import user_mod
 from author_mod import Author
 from sql_connection import connection_to_db
@@ -111,7 +111,7 @@ class Book:
             self.availability = True
 
 # ==================== ***** Functions ***** ====================
-
+# Here down needs fixing
 def add_book():
     '''Creates new book and prints confirmation.'''
     clr()
@@ -133,18 +133,22 @@ def add_book():
                     '''
         cursor.execute(query1, (author_name, biography))
         connection.commit()
+        new_author_id = cursor.lastrowid
+        
 
         query2 = '''
-                    INSERT INTO books (title, genre, publication_date)
-                    VALUES (%s,%s,%s);
+                    INSERT INTO books (title, genre, publication_date, author_id)
+                    VALUES (%s, %s, %s, %s);
                     '''
-        cursor.execute(query2, (title, genre, publication_date))
+        cursor.execute(query2, (title, genre, publication_date, new_author_id))
         connection.commit()
 
         clr()
         hr(50)
+        print(congrats)
         print("The following book has been added:\n")
         print(f"Title: {title}\nAuthor: {author_name}")
+        hr(50)
     finally:
         cursor.close()
         connection.close()
