@@ -112,7 +112,7 @@ def view_author_details():
     finally:
         cursor.close()
         connection.close()
-# From here down needs fixing 
+
 def display_authors():
     clr()
     hr(50)
@@ -135,7 +135,6 @@ def display_authors():
     finally:
         cursor.close()
         connection.close()
-
 
 def author_menu():
     clr()

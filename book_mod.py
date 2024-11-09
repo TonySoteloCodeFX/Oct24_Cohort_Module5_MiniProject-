@@ -2,9 +2,9 @@ from helpers import clr, hr
 from art import main_book_menu
 import user_mod
 from author_mod import Author
+from sql_connection import connection_to_db
 
 class Book:
-    book_library = []
 
     def __init__(self, title, author, genre, publication_date):
         '''Creates new book and adds it to book library.'''
@@ -13,19 +13,93 @@ class Book:
         self.genre = genre
         self.publication_date = publication_date
         self.availability = True
-        Book.book_library.append(self)
 
     def get_title(self):
-        return self.title
+        self.connection = connection_to_db()
+        self.cursor = self.connection.cursor()
+        try:
+            self.book_title = input("Enter Book Title: ")
+            self.query =  '''
+                            SELECT * FROM books
+                            WHERE title = %s
+                            '''
+            self.cursor.execute(self.query, (self.book_title,))
+            self.columns = self.column_names
+
+            for self.row in self.cursor.fetchall():
+                self.row_data = dict(zip(self.columns, self.row))
+                print(f"Title: {self.row_data['title']}")
+        finally:
+            self.cursor.close()
+            self.connection.close()
     
     def get_author(self):
-        return self.author
+        self.connection = connection_to_db()
+        self.cursor = self.connection.cursor()
+        try:
+            self.book_title = input("Enter Book Title: ")
+            self.query1 = '''
+                            SELECT author_id
+                            FROM books
+                            WHERE title = %s
+                            '''
+            self.cursor.execute(self.query1, (self.book_title,))
+            self.author_id = self.cursor.fetchone()
+
+            self.query2 = '''
+                            SELECT name
+                            FROM authors
+                            WHERE author_id = %s
+                            '''
+            self.cursor.execute(self.query2, (self.author_id,))
+            self.columns = self.column_names
+
+            for self.row in self.cursor.fetchall():
+                self.row_data = dict(zip(self.columns, self.row))
+                print(f"Author: {self.row_data['name']}")
+        finally:
+            self.cursor.close()
+            self.connection.close()
     
     def get_genre(self):
-        return self.genre
+        self.connection = connection_to_db()
+        self.cursor = self.connection.cursor()
+        try:
+            self.book_genre = input("Enter Book Title: ")
+            self.query = '''
+                            SELECT genre
+                            FROM books
+                            WHERE title = %s
+                            '''
+            self.cursor.execute(self.query, (self.book_genre,))
+            self.columns = self.column_names
+
+            for self.row in self.cursor.fetchall():
+                self.row_data = dict(zip(self.columns, self.row))
+                print(f"Genre: {self.row_data['genre']}")
+        finally:
+            self.cursor.close()
+            self.connection.close()
     
     def get_publication_date(self):
-        return self.publication_date
+        self.connection = connection_to_db()
+        self.cursor = self.connection.cursor()
+        try:
+            self.book_title = input("Enter Book Title: ")
+            self.query = '''
+                            SELECT publication_date
+                            FROM books
+                            WHERE title %s
+                            '''
+            self.cursor.execute(self.query, (self.book_title,))
+            self.columns = self.cursor.column_names
+
+            for self.row in self.cursor.fetchall():
+                self.row_data = dict(zip(self.columns, self.row))
+                print(f"Publication Date: {self.row_data['publication_date']}")
+        finally:
+            self.cursor.close()
+            self.connection.close()
 
     def get_availability(self):
         return self.availability
@@ -36,16 +110,6 @@ class Book:
         else:
             self.availability = True
 
-    @classmethod
-    def display_all_books(cls):
-        clr()
-        hr(50)
-        print("Books In Library")
-        for book in cls.book_library:
-            hr(50)
-            print(f"Title: {book.get_title()}")
-            print(f"Author: {book.get_author()}")
-
 # ==================== ***** Functions ***** ====================
 
 def add_book():
@@ -53,30 +117,37 @@ def add_book():
     clr()
     hr(50)
     try:
+        connection = connection_to_db()
+        cursor = connection.cursor()
+
         title = input("Enter Title: ")
-        author_name = input("Enter Author: ")
-
-        author_data = None
-        for author in Author.authors:
-            if author.get_author_name() == author_name:
-                author_data = author
-                break
-
-        if not author_data:
-            biography = input("Enter Biography: ")
-            author_data = Author(author_name, biography)
-
         genre = input("Enter Genre: ")
         publication_date = input("Enter Publication Date: ")
 
-        new_book = Book(title, author_data, genre, publication_date)
+        author_name = input("Enter Author: ")
+        biography = input("Enter Author Biography: ")
+
+        query1 = '''
+                    INSERT INTO authors (name, biography)
+                    Values (%s, %s);
+                    '''
+        cursor.execute(query1, (author_name, biography))
+        connection.commit()
+
+        query2 = '''
+                    INSERT INTO books (title, genre, publication_date)
+                    VALUES (%s,%s,%s);
+                    '''
+        cursor.execute(query2, (title, genre, publication_date))
+        connection.commit()
+
         clr()
         hr(50)
-        print(f'{new_book.title}: by {new_book.author},\nhas been added to your library.')
-    except ValueError:
-        clr()
-        hr(50)
-        print("Input is invalid. Try again.")
+        print("The following book has been added:\n")
+        print(f"Title: {title}\nAuthor: {author_name}")
+    finally:
+        cursor.close()
+        connection.close()
 
 def display_books():
     Book.display_all_books()
