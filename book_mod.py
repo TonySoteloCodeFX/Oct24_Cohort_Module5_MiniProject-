@@ -111,7 +111,7 @@ class Book:
             self.availability = True
 
 # ==================== ***** Functions ***** ====================
-# Here down needs fixing
+
 def add_book():
     '''Creates new book and prints confirmation.'''
     clr()
@@ -260,23 +260,57 @@ def return_book():
 def search_book():
     clr()
     hr(50)
-    lookup_title = input("Enter Title: ")
+    try:
+        connection = connection_to_db()
+        cursor = connection.cursor()
 
-    book_to_lookup = None
-    for book in Book.book_library:
-        if book.get_title() == lookup_title:
-            book_to_lookup = book
-            break
-    clr()
-    hr(50)
-    print(f"Title: {book_to_lookup.get_title()}")
-    print(f"Author: {book_to_lookup.get_author()}")
-    print(f"Genre: {book_to_lookup.get_genre()}")
-    print(f"Publication Date: {book_to_lookup.get_publication_date()}")
-    if book_to_lookup.get_availability() == True:
-        print("Availability: Available Now")
-    else:
-        print("Availability: Not Available")
+        print("\nWhich book title would you like to search for?")
+        lookup_title = input("Enter Title: ")
+
+        query1 = '''
+                    SELECT * FROM books
+                    WHERE title = %s;
+                '''
+        cursor.execute(query1, (lookup_title,))
+        book_results = cursor.fetchall()
+
+        if not book_results:
+            print("Title not found.")
+            return
+        clr()
+        hr(50)
+        print("Book Details:\n")
+
+        for row in book_results:
+            columns = cursor.column_names
+            row_data = dict(zip(columns, row))
+
+            fetch_availability = row_data['availability']
+            if fetch_availability == 1:
+                availability = "Book is available."
+            else:
+                availability = "Book is not available."
+
+
+            
+
+            search_author_id = row_data['author_id']
+
+            query2 = '''
+                        SELECT name
+                        FROM authors
+                        WHERE id = %s;
+                    '''
+            cursor.execute(query2, (search_author_id,))
+            author_id = cursor.fetchone()
+            author_name = author_id[0]
+
+            print(f'''ID: {row_data['id']}\nTitle: {row_data['title']}\nAuthor: {author_name}\nGenre: {row_data['genre']}\nPublication Date: {row_data['publication_date']}\nAvailability: {availability}''')
+        hr(50)
+
+    finally:
+        cursor.close()
+        connection.close()
 
 def book_menu():
     clr()
@@ -303,7 +337,7 @@ def book_menu():
             elif book_operation == 3:
                 pass
             elif book_operation == 4:
-                pass
+                search_book()
             elif book_operation == 5:
                 display_books()
             elif book_operation == 6:
