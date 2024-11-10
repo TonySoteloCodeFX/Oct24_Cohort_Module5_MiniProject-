@@ -154,7 +154,31 @@ def add_book():
         connection.close()
 
 def display_books():
-    Book.display_all_books()
+    clr()
+    hr(50)
+    try:
+        connection = connection_to_db()
+        cursor = connection.cursor()
+        print("Books in Library:\n")
+
+        query = '''SELECT * FROM books'''
+        cursor.execute(query)
+        column = cursor.column_names
+        book = cursor.fetchall()
+
+        for row in book:
+            hr(50)
+            row_data = dict(zip(column, row))
+            print(f"ID: {row_data['id']}\nTitle: {row_data['title']}\nGenre: {row_data['genre']}")
+        hr(50)
+    finally:
+        cursor.close()
+        connection.close()
+
+
+
+        
+
 
 def borrow_book():
     clr()
@@ -275,11 +299,11 @@ def book_menu():
             if book_operation == 1:
                 add_book()
             elif book_operation == 2:
-                borrow_book()
+                pass
             elif book_operation == 3:
-                return_book()
+                pass
             elif book_operation == 4:
-                search_book()
+                pass
             elif book_operation == 5:
                 display_books()
             elif book_operation == 6:
