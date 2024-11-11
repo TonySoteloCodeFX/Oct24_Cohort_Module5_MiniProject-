@@ -86,6 +86,36 @@ def display_all_users():
         cursor.close()
         connection.close()
 
+def view_user_details():
+    clr()
+    hr(50)
+    try:
+        connection = connection_to_db()
+        cursor = connection.cursor()
+
+        print("Who's details would you like to see?\n")
+        user_name = input("Enter Name: ")
+        query = '''
+                    SELECT * FROM users
+                    WHERE name = %s
+                '''
+        cursor.execute(query, (user_name,))
+        columns = cursor.column_names
+
+        clr()
+        hr(50)
+        print(f"User Details:\n")
+
+        for row in cursor.fetchall():
+            hr(50)
+            row_data = dict(zip(columns, row))
+
+            print(f"ID: {row_data['id']}\nName: {row_data['name']}\nBook Borrowed: {row_data['borrowed_books']}")
+        hr(50)
+    finally:
+        cursor.close()
+        connection.close()
+
 def user_menu():
     clr()
     hr(50)
@@ -105,7 +135,7 @@ def user_menu():
             if user_operation == 1:
                 add_user()
             elif user_operation == 2:
-                pass
+                view_user_details()
             elif user_operation == 3:
                 display_all_users()
             elif user_operation == 4:

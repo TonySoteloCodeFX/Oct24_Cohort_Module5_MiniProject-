@@ -347,33 +347,32 @@ def return_book():
             
         query2 =  '''
                     UPDATE users
-                    SET borrowed_status = TRUE
+                    SET borrowed_status = TRUE, borrowed_books = NULL
                     WHERE id = %s;
                 '''
         cursor.execute(query2, (user_id,))
         connection.commit()
 
         query3 = '''
-                    UPDATE users 
-                    SET borrowed_books = 
-                    WHERE id = %s;
-                '''
-        cursor.execute(query3, (user_id,))
-        connection.commit()
-
-        query4 = '''
                     UPDATE books
                     SET availability = TRUE
                     WHERE title = %s;
                 '''
-        cursor.execute(query4, (book_borrowed,))
+        cursor.execute(query3, (book_borrowed,))
         connection.commit()
 
-        query5 = '''
+        query4 = '''
                     DELETE FROM books_borrowed
                     WHERE user_id = %s;
                 '''
-        cursor.execute(query5, user_id)
+        clr()
+        hr(50)
+        print(congrats)
+        print(f"Hi {user_name}!\nThank you for returning {book_borrowed}.")
+        print("You're now able to borrow another book. Thank you.")
+        hr(50)
+
+        cursor.execute(query4, (user_id,))
         connection.commit()
 
     finally:
