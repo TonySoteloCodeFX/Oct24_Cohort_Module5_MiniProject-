@@ -11,7 +11,6 @@ CREATE TABLE books (
     title VARCHAR(50) NOT NULL,
     genre VARCHAR(50) NOT NULL,
     publication_date DATE,
- -- author_name VARCHAR(50), 
     availability BOOLEAN DEFAULT TRUE
 );
 
@@ -29,10 +28,16 @@ ALTER TABLE books
 ADD author_id INT,
 ADD FOREIGN KEY (author_id) REFERENCES authors(id);
 
-ALTER TABLE books
-DROP COLUMN author_name;
+ALTER TABLE users
+ADD COLUMN borrowed_status BOOLEAN DEFAULT TRUE;
 
 SELECT * FROM books;
 SELECT * FROM authors;
 SELECT * FROM users;
 SELECT * FROM books_borrowed;
+
+UPDATE users 
+SET borrowed_books = None
+WHERE id  = 8;
+
+

@@ -80,8 +80,8 @@ def display_all_users():
             hr(50)
             row_data = dict(zip(columns, row))
 
-            for column, value in row_data.items():
-                print(f"{column}: {value}")
+            print(f"ID: {row_data['id']}\nName: {row_data['name']}")
+        hr(50)
     finally:
         cursor.close()
         connection.close()

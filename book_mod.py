@@ -175,88 +175,6 @@ def display_books():
         cursor.close()
         connection.close()
 
-
-
-        
-
-
-def borrow_book():
-    clr()
-    hr(50)
-    user_name = input("Enter Your Name: ")
-    borrowing_user = None
-    for user in user_mod.User.users:
-        if user.get_user_name() == user_name:
-            borrowing_user = user
-            break
-    if not borrowing_user:
-        print("User not found.")
-        return
-    
-    borrow_title = input("Enter Title: ")
-    book_to_borrow = None
-    for book in Book.book_library:
-        if book.get_title() == borrow_title:
-            book_to_borrow = book
-            break
-
-    if book_to_borrow:
-        if book_to_borrow.get_availability() == True:
-            clr()
-            hr(50)
-            print("Thank you!")
-            print(f"You have now borrowed: {book_to_borrow.get_title()}.")
-            book_to_borrow.switch_availability()
-            borrowing_user.book_list.append(book_to_borrow)
-        else:
-            clr()
-            hr(50)
-            print(f"Sorry, {borrow_title} is currently unavailable.")
-    else:
-        clr()
-        hr(50)
-        print(f"{borrow_title} not found in the library.")
-
-def return_book():
-    clr()
-    hr(50)
-
-    user_name = input("Enter Your Name: " )
-    returning_user = None
-    for user in user_mod.User.users:
-        if user.get_user_name() == user_name:
-            returning_user = user
-            break
-    if not returning_user:
-        print("User not found.")
-        return
-    
-    return_title = input("Enter Title: ")
-    book_to_return = None
-    for book in Book.book_library:
-        if book.get_title() == return_title:
-            book_to_return = book
-            break
-
-    if book_to_return:
-        if book_to_return.get_availability() == False:
-            clr()
-            hr(50)
-            print("Thank you!")
-            print(f"You have now returned: {book_to_return.get_title()}.")
-            book_to_return.switch_availability()
-
-            if book_to_return in returning_user.book_list:
-                returning_user.book_list.remove(book_to_return)
-        else:
-            clr()
-            hr(50)
-            print(f"Sorry, {return_title} was never borrowed.")
-    else:
-        clr()
-        hr(50)
-        print(f"{return_title} not found in the library.")
-
 def search_book():
     clr()
     hr(50)
@@ -291,9 +209,6 @@ def search_book():
             else:
                 availability = "Book is not available."
 
-
-            
-
             search_author_id = row_data['author_id']
 
             query2 = '''
@@ -311,6 +226,160 @@ def search_book():
     finally:
         cursor.close()
         connection.close()
+
+def borrow_book():
+    clr()
+    hr(50)
+    try:
+        connection = connection_to_db()
+        cursor = connection.cursor()
+
+        user_name = input("Enter your name: ")
+        query1 = '''
+                    SELECT * FROM users
+                    WHERE name = %s;
+                '''
+        cursor.execute(query1, (user_name,))
+        columns = cursor.column_names
+        
+        for row in cursor.fetchall():      
+            row_data = dict(zip(columns, row))
+            status = row_data['borrowed_status']
+            book_borrowed = row_data['borrowed_books']
+            user_id = row_data['id']
+
+            if status != 1:
+                clr()
+                hr(50)
+                print(f"Sorry {user_name},\nYou can borrow a book once {book_borrowed}, is returned.")
+                hr(50)
+                return
+        clr()
+        hr(50)
+        print(f"Hi {user_name},\nWhat book would you like to borrow?\n")
+        book_to_borrow = input("Enter Book Title: ")
+
+        query2 = '''
+                    SELECT *
+                    FROM books
+                    WHERE title = %s;
+                '''
+        cursor.execute(query2, (book_to_borrow,))
+        columns2 = cursor.column_names
+
+        for row in cursor.fetchall():
+            row_data2 = dict(zip(columns2, row))
+            book_title = row_data2['title']
+            book_id = row_data2['id']
+
+            if not book_title:
+                clr()
+                hr(50)
+                print(f"Sorry {user_name},\nWe don't seem to have this book.")
+                hr(50)
+                return
+            elif row_data2['availability'] != 1:
+                clr()
+                hr(50)
+                print(f"Sorry {user_name},\n{book_title}, is not currently available.")
+                hr(50)
+                return
+            
+        query3 = '''
+                    UPDATE books
+                    SET availability = FALSE
+                    WHERE title = %s;
+                '''
+        cursor.execute(query3, (book_to_borrow,))
+        connection.commit()
+
+        query4 = '''
+                    UPDATE users 
+                    SET borrowed_books = %s, borrowed_status = FALSE
+                    WHERE name = %s;
+                    '''
+        cursor.execute(query4, (book_to_borrow, user_name))
+        connection.commit()
+
+        query5 = '''
+                    INSERT INTO books_borrowed (book_id, user_id)
+                    VALUES (%s, %s);
+                '''
+        cursor.execute(query5, (book_id, user_id))
+        connection.commit()
+
+        clr()
+        hr(50)
+        print(congrats)
+        print(f"Congratulations {user_name}!\nYou have just borrowed {book_to_borrow}!\nPlease return it before borrowing another book.\nThank you!")
+        hr(50)
+    finally:
+        cursor.close()
+        connection.close()
+
+def return_book():
+    clr()
+    hr(50)
+    try:
+        connection = connection_to_db()
+        cursor = connection.cursor()
+
+        user_name = input("Enter your name: ")
+        query1 = '''
+                    SELECT * FROM users
+                    WHERE name = %s;
+                '''
+        cursor.execute(query1, (user_name,))
+        columns = cursor.column_names
+
+        for row in cursor.fetchall():      
+            row_data = dict(zip(columns, row))
+            status = row_data['borrowed_status']
+            book_borrowed = row_data['borrowed_books']
+            user_id = row_data['id']
+
+            if status == 1:
+                clr()
+                hr(50)
+                print(f"Sorry {user_name},\nYou don't have any books to return at the moment.")
+                hr(50)
+                return
+            
+        query2 =  '''
+                    UPDATE users
+                    SET borrowed_status = TRUE
+                    WHERE id = %s;
+                '''
+        cursor.execute(query2, (user_id,))
+        connection.commit()
+
+        query3 = '''
+                    UPDATE users 
+                    SET borrowed_books = 
+                    WHERE id = %s;
+                '''
+        cursor.execute(query3, (user_id,))
+        connection.commit()
+
+        query4 = '''
+                    UPDATE books
+                    SET availability = TRUE
+                    WHERE title = %s;
+                '''
+        cursor.execute(query4, (book_borrowed,))
+        connection.commit()
+
+        query5 = '''
+                    DELETE FROM books_borrowed
+                    WHERE user_id = %s;
+                '''
+        cursor.execute(query5, user_id)
+        connection.commit()
+
+    finally:
+        cursor.close()
+        connection.close()
+
 
 def book_menu():
     clr()
@@ -333,9 +402,9 @@ def book_menu():
             if book_operation == 1:
                 add_book()
             elif book_operation == 2:
-                pass
+                borrow_book()
             elif book_operation == 3:
-                pass
+                return_book()
             elif book_operation == 4:
                 search_book()
             elif book_operation == 5:
